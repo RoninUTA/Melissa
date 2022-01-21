@@ -1,0 +1,36 @@
+#!/bin/bash
+### verify line endings to \n before running script ###
+dateStamp=$(date +"%d%b%Y-%H%M%S")
+### removing all headers in csv in dir to prep for column insert and cleaning ###
+sed -i '1d' *.csv
+echo "sed header removal complete, starting zipcode append"
+sleep 3
+####################
+### for loop to append filename, zipcode, new col at end of line ###
+### remember the del comma, you didn't put that in your comments last time ###
+### because I have a tendency to snarky comments to myself in my code, bite me Chris ###
+### the original readme left out the deliminator comma before the sed substitution, there are you happy now###
+for f in *.csv
+    do
+        sed -i 's/$/,'"$f"'/' "$f"
+    done
+echo "filename appending complete, starting csv filemerge"
+sleep 3
+####################
+### merge of all csv files with date timestamp in filename ###
+cat *.csv > mergedCSV-$dateStamp.csv
+echo "merged file  mergedCSV-$dateStamp.csv written"
+sleep 3
+echo "starting removal of MAK information"
+sleep 3
+####################
+cut -d, -f5 --complement mergedCSV-$dateStamp.csv > mergedCSV-$dateStamp-noMAK.csv
+####################
+### cleaning the .csv from end of line and adding headers back in ###
+echo "trimming now..."
+sleep 3
+sed 's/....$//' mergedCSV-$dateStamp-noMAK.csv > merged-$dateStamp-noMAKtrimmed.csv
+echo "adding headers to file"
+sleep 3
+sed -i 1i"address,suite,city,state,zipcode" merged-$dateStamp-noMAKtrimmed.csv
+echo "complete, please obtain your file via FTP"
